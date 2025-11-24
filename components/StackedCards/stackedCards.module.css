@@ -1,32 +1,3 @@
-/* Stack container */
-.stackContainer {
-  position: relative;
-  width: 100%;
-  margin: 0 auto;
-  padding: clamp(16px, 4vw, 48px) 0 clamp(96px, 14vh, 160px);
-}
-
-/* Individual card wrapper controls vertical space */
-.cardWrapper {
-  position: relative;
-  width: min(100%, 1120px);
-  margin: 0 auto;
-  min-height: 115vh;
-  will-change: transform;
-}
-
-.cardWrapper:first-of-type {
-  margin-top: 0;
-}
-
-/* Sticky behavior */
-.cardStickyContainer {
-  position: sticky;
-  top: var(--stacked-card-top, 96px);
-  width: 100%;
-  will-change: transform;
-}
-
 /* Card shell */
 .cardContainer {
   position: relative;
@@ -47,10 +18,6 @@
 .cardContainer:hover {
   transform: translate3d(0, -6px, 0) scale(1.01) !important;
   box-shadow: 0 50px 140px rgba(10, 10, 10, 0.22);
-}
-
-.cardStickyContainer[data-phase='residual'] .cardContainer {
-  opacity: 0.95;
 }
 
 /* Title band */
@@ -123,14 +90,6 @@
   display: flex;
   flex-direction: column;
   gap: clamp(16px, 2vw, 32px);
-  transform: translate3d(
-    0,
-    calc(var(--stacked-card-cover-progress, 0) * -30px),
-    0
-  );
-  transition: transform 0.1s linear, opacity 0.1s linear;
-  will-change: transform, opacity;
-  opacity: calc(1 - var(--stacked-card-cover-progress, 0) * 0.3);
 }
 
 /* Hero image */

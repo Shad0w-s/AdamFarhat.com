@@ -1,89 +1,100 @@
 'use client'
 
-import { type CSSProperties, useMemo, useState, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Card from './Card'
-import styles from './stackedCards.module.css'
 import { CardData } from './cardTypes'
-import type { ScrollPhaseState } from './useScrollPhase'
 
-const DEFAULT_TITLE_HEIGHT = 148
+gsap.registerPlugin(ScrollTrigger)
 
 interface StackedCardsProps {
   cards: CardData[]
   stickyTop?: number
 }
 
-type PhaseSnapshotMap = Record<string, ScrollPhaseState>
-
 export default function StackedCards({ cards, stickyTop = 104 }: StackedCardsProps) {
-  const orderedCards = useMemo(() => cards ?? [], [cards])
-  const totalCards = orderedCards.length
+  const containerRef = useRef<HTMLDivElement>(null)
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  const spacerRef = useRef<HTMLDivElement | null>(null)
 
-  const [titleHeights, setTitleHeights] = useState<Record<string, number>>({})
-  const [phaseSnapshots, setPhaseSnapshots] = useState<PhaseSnapshotMap>({})
+  useEffect(() => {
+    const cardElements = cardRefs.current.filter(Boolean) as HTMLDivElement[]
 
-  const registerTitleHeight = useCallback((cardId: string, height: number) => {
-    setTitleHeights((prev) => {
-      const previous = prev[cardId]
-      if (previous && Math.abs(previous - height) < 1) {
-        return prev
+    if (cardElements.length === 0) return
+
+    const ctx = gsap.context(() => {
+      const scrollPerCard = window.innerHeight * 1.2
+      const lastCardIndex = cardElements.length - 1
+
+      cardElements.forEach((card, i) => {
+        if (!card) return
+
+        const remainingCards = cardElements.length - i - 1
+        const cardHeight = card.offsetHeight
+        const totalScrollNeeded = remainingCards * scrollPerCard
+
+        // For the last card, it should scroll all the way to the bottom of the card
+        // Since there are no remaining cards, it just needs to scroll through its own height
+        // Then extend the pin slightly to keep it locked in place
+        const isLastCard = i === lastCardIndex
+        const endDistance = isLastCard
+          ? cardHeight + window.innerHeight * 0.5 // Last card: scroll through full height, then lock
+          : cardHeight + totalScrollNeeded
+
+        ScrollTrigger.create({
+          trigger: card,
+          start: `top top+=${stickyTop + i * 40}`,
+          end: () => `+=${endDistance}`,
+          pin: true,
+          pinSpacing: false,
+          id: `card-${i}`,
+        })
+      })
+
+      // Set spacer height to account for all scroll distance
+      // This ensures content below isn't covered by the pinned cards
+      if (spacerRef.current) {
+        const totalScrollDistance = lastCardIndex * scrollPerCard
+        const lastCard = cardElements[lastCardIndex]
+        const lastCardHeight = lastCard?.offsetHeight || 0
+        
+        // Calculate spacer height: total scroll distance + last card height + lock distance
+        // Add a small buffer to ensure smooth transition to content below
+        const lastCardLockDistance = window.innerHeight * 0.5
+        const spacerHeight = totalScrollDistance + lastCardHeight + lastCardLockDistance + window.innerHeight * 0.2
+        
+        gsap.set(spacerRef.current, {
+          height: spacerHeight,
+        })
       }
-      return { ...prev, [cardId]: height }
-    })
-  }, [])
+    }, containerRef)
 
-  const registerPhaseSnapshot = useCallback((cardId: string, snapshot: ScrollPhaseState) => {
-    setPhaseSnapshots((prev) => {
-      const previous = prev[cardId]
-      if (
-        previous &&
-        previous.phase === snapshot.phase &&
-        Math.abs(previous.coverProgress - snapshot.coverProgress) < 0.01 &&
-        Math.abs(previous.slowOffset - snapshot.slowOffset) < 0.5
-      ) {
-        return prev
-      }
-      return { ...prev, [cardId]: snapshot }
-    })
-  }, [])
+    return () => ctx.revert()
+  }, [cards, stickyTop])
 
-  if (totalCards === 0) {
+  if (cards.length === 0) {
     return null
   }
 
-  const containerStyle = {
-    ['--stacked-card-top' as '--stacked-card-top']: `${stickyTop}px`,
-  } as CSSProperties
-
   return (
-    <div
-      className={styles.stackContainer}
-      style={containerStyle}
-    >
-      {orderedCards.map((card, index) => {
-        // Get slow scroll transform from previous card's phase
-        // This creates the parallax effect where the previous card moves slower
-        const previousCard = orderedCards[index - 1]
-        const slowScrollTransform = previousCard
-          ? phaseSnapshots[previousCard.id]?.slowOffset ?? 0
-          : 0
-
-        return (
-          <Card
-            key={card.id}
-            card={card}
-            index={index}
-            totalCards={totalCards}
-            zIndex={100 + index}
-            stickyTop={stickyTop}
-            slowScrollTransform={slowScrollTransform}
-            onTitleHeightChange={(height) => registerTitleHeight(card.id, height)}
-            onPhaseChange={(state) => registerPhaseSnapshot(card.id, state)}
-          />
-        )
-      })}
-    </div>
+    <>
+      <div ref={containerRef} className="relative">
+        <div className="max-w-5xl mx-auto px-4 md:px-6 space-y-12">
+          {cards.map((card, index) => (
+            <Card
+              key={card.id}
+              ref={(el) => {
+                cardRefs.current[index] = el
+              }}
+              card={card}
+              index={index}
+            />
+          ))}
+        </div>
+      </div>
+      {/* Spacer to ensure content below isn't covered by pinned cards */}
+      <div ref={spacerRef} style={{ height: '1px' }} aria-hidden="true" />
+    </>
   )
 }
-
-

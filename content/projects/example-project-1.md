@@ -6,7 +6,7 @@ category: "Product"
 timeframe: "Jan 2024 – Apr 2024"
 techStack: "Next.js, TypeScript, Tailwind, Supabase"
 accentColor: "#004c99"
-image: "/images/projects/example-project-1.jpg"
+image: "/images/projects/example-project-1.avif"
 ---
 
 ## Problem

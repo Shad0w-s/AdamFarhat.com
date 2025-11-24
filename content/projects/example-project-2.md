@@ -5,8 +5,8 @@ year: "2023"
 category: "Product"
 timeframe: "Sep 2023 – Dec 2023"
 techStack: "React, Node.js, PostgreSQL"
-accentColor: "#0066cc"
-image: "/images/projects/example-project-2.jpg"
+accentColor: "#2d2d2d"
+image: "/images/projects/example-project-2.avif"
 ---
 
 ## Problem

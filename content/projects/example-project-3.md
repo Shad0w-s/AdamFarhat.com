@@ -5,8 +5,8 @@ year: "2023"
 category: "Design"
 timeframe: "Jun 2023 – Aug 2023"
 techStack: "Figma, React, CSS"
-accentColor: "#2d5016"
-image: "/images/projects/example-project-3.jpg"
+accentColor: "#6b46c1"
+image: "/images/projects/example-project-3.avif"
 ---
 
 ## Problem

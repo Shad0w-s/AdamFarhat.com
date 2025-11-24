@@ -29,27 +29,29 @@ export default function ProjectsPreview({ projects }: ProjectsPreviewProps) {
           process behind every launch.
         </p>
       </div>
-      <StackedCards cards={cards} />
-      <div className="text-center mt-12">
-        <Link
-          href="/projects"
-          className="inline-flex items-center gap-2 px-6 py-3 border border-foreground/20 rounded-md hover:border-foreground/40 hover:bg-foreground/5 transition-all group"
-        >
-          <span>view all projects</span>
-          <svg
-            className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+      <div className="relative">
+        <StackedCards cards={cards} />
+        <div className="text-center pt-6">
+          <Link
+            href="/projects"
+            className="inline-flex items-center gap-2 px-6 py-3 border border-foreground/20 rounded-md hover:border-foreground/40 hover:bg-foreground/5 transition-all group"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M7 17L17 7M7 7h10v10"
-            />
-          </svg>
-        </Link>
+            <span>view all projects</span>
+            <svg
+              className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 17L17 7M7 7h10v10"
+              />
+            </svg>
+          </Link>
+        </div>
       </div>
     </SectionContainer>
   )

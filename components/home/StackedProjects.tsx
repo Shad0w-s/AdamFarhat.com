@@ -3,8 +3,15 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ProjectSummary } from '@/lib/types'
-import { useScroll, useTransform, motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+// Register ScrollTrigger plugin
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger)
+}
 
 interface StackedProjectsProps {
   projects: ProjectSummary[]
@@ -12,41 +19,106 @@ interface StackedProjectsProps {
 
 export default function StackedProjects({ projects }: StackedProjectsProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(containerRef, { once: false, amount: 0.2 })
-  
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start end', 'end start'],
-  })
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Calculate dynamic spacing based on viewport
+  const getDynamicSpacing = () => {
+    if (typeof window === 'undefined') return 60
+    const viewportHeight = window.innerHeight
+    return Math.max(viewportHeight * 0.08, 60)
+  }
+
+  useGSAP(
+    () => {
+      if (!containerRef.current) return
+
+      const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 800
+      const baseSpacing = getDynamicSpacing()
+
+      // Create a single ScrollTrigger that tracks the container
+      // Using optimized settings for smooth performance
+      const trigger = ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 1.2,
+        anticipatePin: 1, // Optimize pinning performance
+        onUpdate: (self) => {
+          const progress = self.progress
+
+          cardRefs.current.forEach((cardElement, index) => {
+            if (!cardElement) return
+
+            // Calculate progress for each card
+            const cardStart = index / projects.length
+            const cardEnd = (index + 1) / projects.length
+            
+            // Map progress to card-specific progress
+            const cardProgress = gsap.utils.clamp(
+              0,
+              1,
+              gsap.utils.mapRange(cardStart, cardEnd, 0, 1, progress, true)
+            )
+
+            // Calculate dynamic Y offset
+            // Cards start spaced out and move closer together as scrolled
+            const initialYOffset = index * baseSpacing
+            const targetYOffset = index * baseSpacing - (viewportHeight * 0.12)
+            const yOffset = gsap.utils.interpolate(
+              initialYOffset,
+              targetYOffset,
+              cardProgress
+            )
+
+            // Scale animation: slight scale up in the middle
+            const scale = gsap.utils.interpolate(
+              [0.96, 1, 0.96],
+              [0, 0.5, 1],
+              cardProgress
+            )
+
+            // Apply transforms with GSAP for smooth performance
+            gsap.set(cardElement, {
+              y: yOffset,
+              scale: scale,
+              force3D: true,
+            })
+          })
+        },
+      })
+
+      // Handle window resize with debouncing for performance
+      const handleResize = () => {
+        if (resizeTimeoutRef.current) {
+          clearTimeout(resizeTimeoutRef.current)
+        }
+        resizeTimeoutRef.current = setTimeout(() => {
+          ScrollTrigger.refresh()
+        }, 150)
+      }
+
+      window.addEventListener('resize', handleResize, { passive: true })
+
+      // Cleanup
+      return () => {
+        trigger.kill()
+        if (resizeTimeoutRef.current) {
+          clearTimeout(resizeTimeoutRef.current)
+        }
+        window.removeEventListener('resize', handleResize)
+      }
+    },
+    {
+      scope: containerRef,
+      dependencies: [projects.length],
+    }
+  )
 
   return (
     <div ref={containerRef} className="relative">
       <div className="space-y-0">
         {projects.map((project, index) => {
-          // Calculate progress for each card
-          const cardProgress = useTransform(
-            scrollYProgress,
-            [
-              index / projects.length,
-              (index + 0.5) / projects.length,
-              (index + 1) / projects.length,
-            ],
-            [0, 1, 0]
-          )
-
-          // Sticky positioning with offset for stacking
-          const yOffset = useTransform(
-            cardProgress,
-            [0, 1],
-            [index * 60, index * 60 - 80]
-          )
-
-          const scale = useTransform(
-            cardProgress,
-            [0, 0.5, 1],
-            [0.96, 1, 0.96]
-          )
-
           // Determine colors based on index
           const isFirst = index === 0
           const isSecond = index === 1
@@ -74,16 +146,23 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
             arrowColor = 'text-gray-300/60'
           }
 
+          // Dynamic bottom margin based on viewport
+          const dynamicBottomMargin = typeof window !== 'undefined'
+            ? `-${window.innerHeight * 0.3}px`
+            : '-200px'
+
           return (
-            <motion.div
+            <div
               key={project.slug}
-              style={{
-                y: yOffset,
-                opacity: 1, // Make cards fully opaque
-                scale,
-                zIndex: projects.length - index,
+              ref={(el) => {
+                cardRefs.current[index] = el
               }}
-              className="sticky top-20 md:top-24 mb-[-200px] md:mb-[-300px]"
+              style={{
+                opacity: 1,
+                zIndex: projects.length - index,
+                marginBottom: dynamicBottomMargin,
+              }}
+              className="sticky top-20 md:top-24"
             >
               <Link
                 href={`/projects/${project.slug}`}
@@ -133,11 +212,10 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
                   )}
                 </div>
               </Link>
-            </motion.div>
+            </div>
           )
         })}
       </div>
     </div>
   )
 }
-
