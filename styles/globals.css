@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=DM+Mono:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+}
+
+.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Wide vertical pinstripe background pattern */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 60px,
+    rgba(0, 0, 0, 0.04) 60px,
+    rgba(0, 0, 0, 0.04) 62px
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+.dark body::before {
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 60px,
+    rgba(255, 255, 255, 0.06) 60px,
+    rgba(255, 255, 255, 0.06) 62px
+  );
+}
+
+@layer base {
+  h1 {
+    @apply text-display font-display font-bold tracking-tight text-balance;
+  }
+  h2 {
+    @apply text-display-sm font-display font-bold tracking-tight text-balance;
+  }
+  h3 {
+    @apply text-3xl md:text-4xl font-display font-semibold tracking-tight;
+  }
+  h4 {
+    @apply text-2xl md:text-3xl font-display font-semibold;
+  }
+  p {
+    @apply text-base md:text-lg leading-relaxed;
+  }
+  .display-text {
+    @apply text-display font-display font-bold tracking-tighter;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
