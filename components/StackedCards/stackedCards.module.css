@@ -10,15 +10,10 @@
   padding: clamp(20px, 4vw, 48px);
   overflow: hidden;
   box-shadow: 0 40px 120px rgba(15, 15, 20, 0.18);
-  transition: box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   /* Removed transform transition - it fights with GSAP pinning */
 }
 
-/* Hover effects disabled during GSAP pinning to prevent conflicts */
-.cardContainer:hover {
-  box-shadow: 0 50px 140px rgba(10, 10, 10, 0.22);
-  /* Transform removed - conflicts with GSAP pinning transforms */
-}
+/* Hover effects removed - only arrow rotation and image zoom remain */
 
 /* Title band */
 .titleBand {
@@ -105,19 +100,26 @@
 
 .heroImage {
   object-fit: cover;
-  /* Transform transition removed - conflicts with GSAP pinning */
   will-change: transform;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Hover scale removed to prevent conflicts with GSAP */
+/* Image zoom on hover */
 .cardContainer:hover .heroImage {
-  /* Transform removed - conflicts with GSAP pinning */
+  transform: scale(1.05);
 }
 
 /* CTA */
 .cardCTA {
   position: absolute;
-  top: clamp(16px, 3vw, 32px);
+  /* Align with title center: card padding + titleBandMeta height + title margin-top + half of first title line */
+  /* Calculation accounts for: padding-top, titleBandMeta row (~1rem), title margin-top, and center of title text */
+  top: calc(
+    clamp(20px, 4vw, 48px) + 
+    clamp(16px, 1.5vw, 20px) + 
+    clamp(12px, 1.5vw, 24px) + 
+    clamp(1.3125rem, 2.625vw, 2.3625rem)
+  );
   right: clamp(16px, 3vw, 32px);
   width: clamp(48px, 7vw, 72px);
   height: clamp(48px, 7vw, 72px);
@@ -126,16 +128,20 @@
   justify-content: center;
   pointer-events: none;
   z-index: 3;
+  transform: translateY(-50%);
 }
 
 .cardArrow {
   width: 100%;
   height: 100%;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cardContainer:hover .cardArrow {
-  transform: translate3d(4px, -4px, 0);
+  transform: rotate(-45deg);
 }
 
 /* Placeholder */
