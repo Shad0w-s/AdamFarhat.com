@@ -83,6 +83,22 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
         },
       })
 
+      // 🔑 Fix 1: Force a refresh once the browser has painted
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh()
+      })
+
+      // 🔑 Fix 2: Refresh again when images finish loading
+      const handleImagesLoaded = () => {
+        ScrollTrigger.refresh()
+      }
+
+      const images = containerRef.current.querySelectorAll('img')
+      images.forEach((img) => {
+        if (img.complete) return
+        img.addEventListener('load', handleImagesLoaded)
+      })
+
       // Handle window resize with debouncing for performance
       const handleResize = () => {
         if (resizeTimeoutRef.current) {
@@ -102,6 +118,9 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
           clearTimeout(resizeTimeoutRef.current)
         }
         window.removeEventListener('resize', handleResize)
+        images.forEach((img) =>
+          img.removeEventListener('load', handleImagesLoaded)
+        )
       }
     },
     {
