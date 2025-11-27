@@ -43,7 +43,8 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
         start: 'top bottom',
         end: 'bottom top',
         scrub: 1.2,
-        anticipatePin: 1, // Optimize pinning performance
+        anticipatePin: 1,
+        invalidateOnRefresh: true, // 🔑 KEY: Recalculate everything on refresh
         onUpdate: (self) => {
           const progress = self.progress
 
@@ -83,14 +84,26 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
         },
       })
 
-      // 🔑 Fix 1: Force a refresh once the browser has painted
+      // 🔑 Fix 1: Force hard refresh after paint
       requestAnimationFrame(() => {
-        ScrollTrigger.refresh()
+        ScrollTrigger.refresh(true)
       })
 
-      // 🔑 Fix 2: Refresh again when images finish loading
+      // 🔑 Fix 2: Refresh after fonts load (critical for layout!)
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          ScrollTrigger.refresh(true)
+        })
+      }
+
+      // 🔑 Fix 3: Delayed fallback refresh (for edge cases in production)
+      const delayedRefresh = setTimeout(() => {
+        ScrollTrigger.refresh(true)
+      }, 500)
+
+      // 🔑 Fix 4: Refresh when images load
       const handleImagesLoaded = () => {
-        ScrollTrigger.refresh()
+        ScrollTrigger.refresh(true)
       }
 
       const images = containerRef.current.querySelectorAll('img')
@@ -105,7 +118,7 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
           clearTimeout(resizeTimeoutRef.current)
         }
         resizeTimeoutRef.current = setTimeout(() => {
-          ScrollTrigger.refresh()
+          ScrollTrigger.refresh(true)
         }, 150)
       }
 
@@ -114,6 +127,7 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
       // Cleanup
       return () => {
         trigger.kill()
+        clearTimeout(delayedRefresh)
         if (resizeTimeoutRef.current) {
           clearTimeout(resizeTimeoutRef.current)
         }
