@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ProjectSummary } from '@/lib/types'
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -21,9 +21,29 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  
+  // 🔍 DEBUG: Visual debug state
+  const [debugInfo, setDebugInfo] = useState({
+    scrollTriggerLoaded: false,
+    triggerCreated: false,
+    containerHeight: 0,
+    card3Progress: 0,
+    card3YOffset: 0,
+    card3TargetYOffset: 0,
+  })
 
   // 🔍 DEBUG: Build version check
-  console.log('StackedProjects build v5 – 2025-11-27 18:00')
+  console.log('🔍 StackedProjects build v6 – 2025-11-27 19:00')
+  
+  // 🔍 DEBUG: Check if ScrollTrigger is loaded
+  useEffect(() => {
+    const checkScrollTrigger = () => {
+      const isLoaded = typeof window !== 'undefined' && typeof ScrollTrigger !== 'undefined'
+      setDebugInfo((prev) => ({ ...prev, scrollTriggerLoaded: isLoaded }))
+      console.log('🔍 ScrollTrigger loaded:', isLoaded)
+    }
+    checkScrollTrigger()
+  }, [])
 
   // Calculate dynamic spacing based on viewport
   const getDynamicSpacing = () => {
@@ -34,10 +54,20 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
 
   useGSAP(
     () => {
-      if (!containerRef.current) return
+      if (!containerRef.current) {
+        console.log('🔍 Container ref is null')
+        return
+      }
 
+      console.log('🔍 useGSAP callback running')
+      
       const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 800
       const baseSpacing = getDynamicSpacing()
+      
+      // 🔍 DEBUG: Update container height
+      const containerHeight = containerRef.current.getBoundingClientRect().height
+      setDebugInfo((prev) => ({ ...prev, containerHeight, triggerCreated: true }))
+      console.log('🔍 Container height:', containerHeight)
 
       // Create a single ScrollTrigger that tracks the container
       // Using optimized settings for smooth performance
@@ -81,13 +111,20 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
 
             // 🔍 DEBUG: Log card 3 progress to diagnose
             if (index === projects.length - 1) {
-              console.log('card3', {
-                progress: self.progress.toFixed(3),
-                cardProgress: cardProgress.toFixed(3),
-                yOffset: yOffset.toFixed(1),
-                targetYOffset: targetYOffset.toFixed(1),
+              const progressData = {
+                progress: parseFloat(self.progress.toFixed(3)),
+                cardProgress: parseFloat(cardProgress.toFixed(3)),
+                yOffset: parseFloat(yOffset.toFixed(1)),
+                targetYOffset: parseFloat(targetYOffset.toFixed(1)),
                 reachedTarget: Math.abs(yOffset - targetYOffset) < 1,
-              })
+              }
+              console.log('🔍 card3', progressData)
+              setDebugInfo((prev) => ({
+                ...prev,
+                card3Progress: progressData.cardProgress,
+                card3YOffset: progressData.yOffset,
+                card3TargetYOffset: progressData.targetYOffset,
+              }))
             }
 
             // Apply transforms with GSAP for smooth performance
@@ -160,6 +197,63 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
 
   return (
     <div ref={containerRef} className="relative pb-[200vh]" data-stack-container>
+      {/* 🔍 DEBUG: Visual debug panel */}
+      <div className="fixed top-4 right-4 z-[9999] bg-black/90 text-white p-4 rounded-lg text-xs font-mono max-w-xs">
+        <div className="font-bold mb-2 text-yellow-400">🔍 DEBUG PANEL</div>
+        <div className="space-y-1">
+          <div>
+            <span className="text-gray-400">Build:</span>{' '}
+            <span className={debugInfo.scrollTriggerLoaded ? 'text-green-400' : 'text-red-400'}>
+              v6 – 2025-11-27 19:00
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-400">ScrollTrigger:</span>{' '}
+            <span className={debugInfo.scrollTriggerLoaded ? 'text-green-400' : 'text-red-400'}>
+              {debugInfo.scrollTriggerLoaded ? '✓ Loaded' : '✗ Not Loaded'}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-400">Trigger Created:</span>{' '}
+            <span className={debugInfo.triggerCreated ? 'text-green-400' : 'text-yellow-400'}>
+              {debugInfo.triggerCreated ? '✓ Yes' : '⏳ Pending'}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-400">Container Height:</span>{' '}
+            <span className="text-blue-400">{Math.round(debugInfo.containerHeight)}px</span>
+          </div>
+          <div className="pt-2 border-t border-gray-700 mt-2">
+            <div className="text-gray-400 mb-1">Card 3 Status:</div>
+            <div>
+              <span className="text-gray-400">Progress:</span>{' '}
+              <span className="text-cyan-400">{(debugInfo.card3Progress * 100).toFixed(1)}%</span>
+            </div>
+            <div>
+              <span className="text-gray-400">Y Offset:</span>{' '}
+              <span className="text-cyan-400">{debugInfo.card3YOffset.toFixed(1)}px</span>
+            </div>
+            <div>
+              <span className="text-gray-400">Target:</span>{' '}
+              <span className="text-cyan-400">{debugInfo.card3TargetYOffset.toFixed(1)}px</span>
+            </div>
+            <div>
+              <span className="text-gray-400">At Target:</span>{' '}
+              <span
+                className={
+                  Math.abs(debugInfo.card3YOffset - debugInfo.card3TargetYOffset) < 1
+                    ? 'text-green-400'
+                    : 'text-red-400'
+                }
+              >
+                {Math.abs(debugInfo.card3YOffset - debugInfo.card3TargetYOffset) < 1
+                  ? '✓ Yes'
+                  : '✗ No'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="space-y-0">
         {projects.map((project, index) => {
           // Determine colors based on index
