@@ -117,7 +117,7 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
   )
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative pb-[150vh]">
       <div className="space-y-0">
         {projects.map((project, index) => {
           // Determine colors based on index
