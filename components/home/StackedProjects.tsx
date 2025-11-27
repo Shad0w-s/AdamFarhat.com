@@ -72,11 +72,15 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
             )
 
             // Scale animation: slight scale up in the middle
-            const scale = gsap.utils.interpolate(
-              [0.96, 1, 0.96],
-              [0, 0.5, 1],
-              cardProgress
-            )
+            // Scale goes from 0.96 -> 1.0 -> 0.96 as progress goes 0 -> 0.5 -> 1
+            let scale: number
+            if (cardProgress <= 0.5) {
+              // First half: interpolate from 0.96 to 1.0
+              scale = gsap.utils.mapRange(0, 0.5, 0.96, 1.0, cardProgress)
+            } else {
+              // Second half: interpolate from 1.0 to 0.96
+              scale = gsap.utils.mapRange(0.5, 1, 1.0, 0.96, cardProgress)
+            }
 
             // Apply transforms with GSAP for smooth performance
             gsap.set(cardElement, {
