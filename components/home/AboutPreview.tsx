@@ -38,13 +38,13 @@ export default function AboutPreview({ bio }: AboutPreviewProps) {
             </svg>
           </Link>
         </div>
-        <div className="relative">
-          <div className="relative w-full aspect-square rounded-lg overflow-hidden">
+        <div className="relative flex items-center justify-center">
+          <div className="relative w-full aspect-[3/4] md:aspect-[2/3] lg:aspect-[3/5]">
             <Image
-              src="/images/about/profile.jpg"
+              src="/images/about/BitAdamWorking.png"
               alt="Adam Farhat"
               fill
-              className="object-cover grayscale hover:grayscale-0 transition-all duration-500"
+              className="object-contain transition-all duration-500"
             />
           </div>
         </div>

@@ -16,7 +16,7 @@ const bio = {
       </p>
     </>
   ),
-  image: '/images/about/profile.jpg',
+  image: '/images/about/BitAdamWavingBackground.png',
 }
 
 const highlights = [

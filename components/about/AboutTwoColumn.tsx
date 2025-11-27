@@ -12,7 +12,7 @@ export default function AboutTwoColumn({
   body,
 }: AboutTwoColumnProps) {
   return (
-    <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-start">
+    <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
       <div className="order-2 md:order-1">
         <h2 className="text-3xl md:text-4xl font-bold mb-6">{title}</h2>
         <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
@@ -20,12 +20,12 @@ export default function AboutTwoColumn({
         </div>
       </div>
       <div className="order-1 md:order-2 relative">
-        <div className="relative w-full aspect-square rounded-lg overflow-hidden md:translate-x-8 md:translate-y-8">
+        <div className="relative w-full aspect-[3/4] md:aspect-[4/5]">
           <Image
             src={image}
             alt={title}
             fill
-            className="object-cover"
+            className="object-contain"
           />
         </div>
       </div>

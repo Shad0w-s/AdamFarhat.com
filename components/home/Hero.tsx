@@ -5,12 +5,19 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 const suffixes = [
   'AI in "boring" industries',
-  'seamless, intuitive UI / UX',
-  'deceptively simple solutions',
-  'solving hard problems with an arm tied behind my back',
+  'how constraints create better engineering',
+  'engineering that feels invisible but works flawlessly',
+  "interfaces that disappear when you're using them",
+  'why simple products are the hardest to make',
+  'the craft of making complex ideas feel simple',
+  'optimization done one small improvement at a time',
+  'the power of compounding',
+  'how small constraints unlock creative solutions',
   'US business history',
   'Cold War history',
   'cooking',
+  'how different kinds of intelligence reinforce each other',
+  'learning from people who thought differently across eras',
 ]
 
 export default function Hero() {

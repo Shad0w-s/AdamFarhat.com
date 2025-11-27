@@ -25,8 +25,7 @@ export default function ProjectsPreview({ projects }: ProjectsPreviewProps) {
       <div className="mb-8 md:mb-12">
         <h2 className="text-display-sm font-display font-bold mb-4 md:mb-6">Projects</h2>
         <p className="text-base md:text-lg text-foreground/70 max-w-2xl">
-          A tactile stack of the latest builds — scroll to peel each layer and dive into the
-          process behind every launch.
+          A layered look at my latest three projects. Scroll to uncover each build and explore the thinking behind it.
         </p>
       </div>
       <StackedCards cards={cards} />
