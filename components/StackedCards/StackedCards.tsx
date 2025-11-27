@@ -27,10 +27,11 @@ export default function StackedCards({ cards, stickyTop = 104 }: StackedCardsPro
       const scrollPerCard = window.innerHeight * 1.2
       const lastCardIndex = cardElements.length - 1
       
-      // Stack region height = scroll needed for all cards to stack (no extra)
-      // This is exactly (cards.length - 1) * scrollPerCard
+      // Stack region height = scroll distance for cards 1 and 2 to come in
+      // This is exactly what's needed for the stack to form, no extra
       const stackRegionHeight = lastCardIndex * scrollPerCard
-      
+
+      // Set stack region height first
       gsap.set(stackRegionRef.current, {
         height: stackRegionHeight,
       })
@@ -41,23 +42,33 @@ export default function StackedCards({ cards, stickyTop = 104 }: StackedCardsPro
         const remainingCards = cardElements.length - i - 1
         const isLastCard = i === lastCardIndex
 
-        // End distance calculation:
-        // - Cards 1 and 2: stay pinned while remaining cards scroll in
-        // - Card 3 (last): minimal end distance - just pins in place, releases immediately
-        // All cards unpin when the stack region ends
-        const endDistance = isLastCard 
-          ? 1 // Last card: pin and release immediately (no scroll required)
-          : remainingCards * scrollPerCard // Other cards: stay pinned until all cards are stacked
-
-        ScrollTrigger.create({
-          trigger: card,
-          start: `top top+=${stickyTop + i * 40}`,
-          end: () => `+=${endDistance}`,
-          pin: true,
-          pinSpacing: false,
-          anticipatePin: 1,
-          id: `card-${i}`,
-        })
+        if (isLastCard) {
+          // Card 3: pin immediately with minimal end distance, use stack region as endTrigger
+          // This ensures it unpins when stack region ends (along with cards 1 & 2)
+          ScrollTrigger.create({
+            trigger: card,
+            start: `top top+=${stickyTop + i * 40}`,
+            endTrigger: stackRegionRef.current!,
+            end: 'bottom bottom',
+            pin: true,
+            pinSpacing: false,
+            anticipatePin: 1,
+            id: `card-${i}`,
+          })
+        } else {
+          // Cards 1 and 2: stay pinned until stack region ends
+          // This keeps them stacked but they'll unpin together when region ends
+          ScrollTrigger.create({
+            trigger: card,
+            start: `top top+=${stickyTop + i * 40}`,
+            endTrigger: stackRegionRef.current!,
+            end: 'bottom bottom',
+            pin: true,
+            pinSpacing: false,
+            anticipatePin: 1,
+            id: `card-${i}`,
+          })
+        }
       })
     }, containerRef)
 
@@ -70,7 +81,7 @@ export default function StackedCards({ cards, stickyTop = 104 }: StackedCardsPro
 
   return (
     <div ref={containerRef} className="relative">
-      {/* Stack region - exact scroll distance for cards to stack, no extra space */}
+      {/* Stack region wrapper - provides exact scroll distance for cards to stack */}
       <div ref={stackRegionRef} className="relative">
         <div className="max-w-5xl mx-auto px-4 md:px-6 space-y-12">
           {cards.map((card, index) => (
