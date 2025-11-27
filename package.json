@@ -16,7 +16,6 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@gsap/react": "^2.1.1",
     "framer-motion": "^11.0.0",
     "gray-matter": "^4.0.3",
     "gsap": "^3.12.5",

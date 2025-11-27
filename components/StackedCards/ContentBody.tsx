@@ -12,7 +12,11 @@ interface ContentBodyProps {
 export default function ContentBody({ heroImage, title, index }: ContentBodyProps) {
   return (
     <div className={styles.contentBody}>
-      <div className={styles.heroImageWrapper} data-card-index={index}>
+      <div 
+        className={styles.heroImageWrapper} 
+        data-card-index={index}
+        data-image-index={index}
+      >
         {heroImage ? (
           <Image
             src={heroImage}

@@ -10,14 +10,14 @@
   padding: clamp(20px, 4vw, 48px);
   overflow: hidden;
   box-shadow: 0 40px 120px rgba(15, 15, 20, 0.18);
-  transition: transform 0.1s linear,
-    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
+  transition: box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Removed transform transition - it fights with GSAP pinning */
 }
 
+/* Hover effects disabled during GSAP pinning to prevent conflicts */
 .cardContainer:hover {
-  transform: translate3d(0, -6px, 0) scale(1.01) !important;
   box-shadow: 0 50px 140px rgba(10, 10, 10, 0.22);
+  /* Transform removed - conflicts with GSAP pinning transforms */
 }
 
 /* Title band */
@@ -105,12 +105,13 @@
 
 .heroImage {
   object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+  /* Transform transition removed - conflicts with GSAP pinning */
   will-change: transform;
 }
 
+/* Hover scale removed to prevent conflicts with GSAP */
 .cardContainer:hover .heroImage {
-  transform: scale(1.04);
+  /* Transform removed - conflicts with GSAP pinning */
 }
 
 /* CTA */

@@ -16,31 +16,38 @@ interface StackedCardsProps {
 export default function StackedCards({ cards, stickyTop = 104 }: StackedCardsProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
-  const spacerRef = useRef<HTMLDivElement | null>(null)
+  const stackRegionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const cardElements = cardRefs.current.filter(Boolean) as HTMLDivElement[]
 
-    if (cardElements.length === 0) return
+    if (cardElements.length === 0 || !stackRegionRef.current) return
 
     const ctx = gsap.context(() => {
       const scrollPerCard = window.innerHeight * 1.2
       const lastCardIndex = cardElements.length - 1
+      
+      // Stack region height = scroll needed for all cards to stack (no extra)
+      // This is exactly (cards.length - 1) * scrollPerCard
+      const stackRegionHeight = lastCardIndex * scrollPerCard
+      
+      gsap.set(stackRegionRef.current, {
+        height: stackRegionHeight,
+      })
 
       cardElements.forEach((card, i) => {
         if (!card) return
 
         const remainingCards = cardElements.length - i - 1
-        const cardHeight = card.offsetHeight
-        const totalScrollNeeded = remainingCards * scrollPerCard
-
-        // For the last card, it should scroll all the way to the bottom of the card
-        // Since there are no remaining cards, it just needs to scroll through its own height
-        // Then extend the pin slightly to keep it locked in place
         const isLastCard = i === lastCardIndex
-        const endDistance = isLastCard
-          ? cardHeight + window.innerHeight * 0.5 // Last card: scroll through full height, then lock
-          : cardHeight + totalScrollNeeded
+
+        // End distance calculation:
+        // - Cards 1 and 2: stay pinned while remaining cards scroll in
+        // - Card 3 (last): minimal end distance - just pins in place, releases immediately
+        // All cards unpin when the stack region ends
+        const endDistance = isLastCard 
+          ? 1 // Last card: pin and release immediately (no scroll required)
+          : remainingCards * scrollPerCard // Other cards: stay pinned until all cards are stacked
 
         ScrollTrigger.create({
           trigger: card,
@@ -48,26 +55,10 @@ export default function StackedCards({ cards, stickyTop = 104 }: StackedCardsPro
           end: () => `+=${endDistance}`,
           pin: true,
           pinSpacing: false,
+          anticipatePin: 1,
           id: `card-${i}`,
         })
       })
-
-      // Set spacer height to account for all scroll distance
-      // This ensures content below isn't covered by the pinned cards
-      if (spacerRef.current) {
-        const totalScrollDistance = lastCardIndex * scrollPerCard
-        const lastCard = cardElements[lastCardIndex]
-        const lastCardHeight = lastCard?.offsetHeight || 0
-        
-        // Calculate spacer height: total scroll distance + last card height + lock distance
-        // Add a small buffer to ensure smooth transition to content below
-        const lastCardLockDistance = window.innerHeight * 0.5
-        const spacerHeight = totalScrollDistance + lastCardHeight + lastCardLockDistance + window.innerHeight * 0.2
-        
-        gsap.set(spacerRef.current, {
-          height: spacerHeight,
-        })
-      }
     }, containerRef)
 
     return () => ctx.revert()
@@ -78,8 +69,9 @@ export default function StackedCards({ cards, stickyTop = 104 }: StackedCardsPro
   }
 
   return (
-    <>
-      <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative">
+      {/* Stack region - exact scroll distance for cards to stack, no extra space */}
+      <div ref={stackRegionRef} className="relative">
         <div className="max-w-5xl mx-auto px-4 md:px-6 space-y-12">
           {cards.map((card, index) => (
             <Card
@@ -93,8 +85,6 @@ export default function StackedCards({ cards, stickyTop = 104 }: StackedCardsPro
           ))}
         </div>
       </div>
-      {/* Spacer to ensure content below isn't covered by pinned cards */}
-      <div ref={spacerRef} style={{ height: '1px' }} aria-hidden="true" />
-    </>
+    </div>
   )
 }

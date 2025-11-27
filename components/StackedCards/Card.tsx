@@ -73,7 +73,10 @@ const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
     <div
       ref={ref}
       className="w-full max-w-5xl mx-auto rounded-3xl overflow-hidden relative"
-      style={{ backgroundColor: card.colorTheme }}
+      style={{ 
+        backgroundColor: card.colorTheme,
+        zIndex: index + 1, // Card 1 = 1 (bottom), Card 2 = 2 (middle), Card 3 = 3 (top)
+      }}
     >
       <Link
         href={card.ctaUrl}
@@ -91,6 +94,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
           category={card.category}
           title={card.title}
           textColor={textColor}
+          index={index}
         />
 
         {/* Content Body - Coverable region */}

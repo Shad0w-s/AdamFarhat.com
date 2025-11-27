@@ -8,10 +8,11 @@ interface TitleBandProps {
   category: string
   title: string
   textColor: string
+  index: number
 }
 
 const TitleBand = forwardRef<HTMLDivElement, TitleBandProps>(function TitleBand(
-  { year, category, title, textColor },
+  { year, category, title, textColor, index },
   ref
 ) {
   return (
@@ -20,6 +21,7 @@ const TitleBand = forwardRef<HTMLDivElement, TitleBandProps>(function TitleBand(
       className={styles.titleBand}
       style={{ color: textColor }}
       data-testid="stacked-card-title-band"
+      data-text-index={index}
     >
       <div className={styles.titleBandMeta}>
         <span className={styles.cardYear}>{year}</span>
