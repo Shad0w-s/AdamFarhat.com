@@ -22,6 +22,9 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  // 🔍 DEBUG: Build version check
+  console.log('StackedProjects build v5 – 2025-11-27 18:00')
+
   // Calculate dynamic spacing based on viewport
   const getDynamicSpacing = () => {
     if (typeof window === 'undefined') return 60
@@ -45,6 +48,7 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
         scrub: 1.2,
         anticipatePin: 1,
         invalidateOnRefresh: true, // 🔑 KEY: Recalculate everything on refresh
+        markers: true, // 🔍 DEBUG: Visual markers to see start/end positions
         onUpdate: (self) => {
           const progress = self.progress
 
@@ -74,6 +78,17 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
             const targetYOffset = initialYOffset - baseReduction - extraLiftForLast
 
             const yOffset = gsap.utils.interpolate(initialYOffset, targetYOffset, cardProgress)
+
+            // 🔍 DEBUG: Log card 3 progress to diagnose
+            if (index === projects.length - 1) {
+              console.log('card3', {
+                progress: self.progress.toFixed(3),
+                cardProgress: cardProgress.toFixed(3),
+                yOffset: yOffset.toFixed(1),
+                targetYOffset: targetYOffset.toFixed(1),
+                reachedTarget: Math.abs(yOffset - targetYOffset) < 1,
+              })
+            }
 
             // Apply transforms with GSAP for smooth performance
             gsap.set(cardElement, {
@@ -144,7 +159,7 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
   )
 
   return (
-    <div ref={containerRef} className="relative pb-[200vh]">
+    <div ref={containerRef} className="relative pb-[200vh]" data-stack-container>
       <div className="space-y-0">
         {projects.map((project, index) => {
           // Determine colors based on index
