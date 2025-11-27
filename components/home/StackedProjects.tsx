@@ -21,6 +21,9 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  
+  // Only apply extra padding in production to ensure content is always below card 3
+  const isProduction = process.env.NODE_ENV === 'production'
 
   // Calculate dynamic spacing based on viewport
   const getDynamicSpacing = () => {
@@ -117,7 +120,10 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
   )
 
   return (
-    <div ref={containerRef} className="relative pb-[150vh]">
+    <div 
+      ref={containerRef} 
+      className={`relative ${isProduction ? 'pb-[200vh]' : ''}`}
+    >
       <div className="space-y-0">
         {projects.map((project, index) => {
           // Determine colors based on index
