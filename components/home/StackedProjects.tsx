@@ -64,7 +64,9 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
             // Calculate dynamic Y offset
             // Cards start spaced out and move closer together as scrolled
             const initialYOffset = index * baseSpacing
-            const targetYOffset = index * baseSpacing - (viewportHeight * 0.12)
+            // Make the reduction proportional to card index so later cards stack closer
+            const reductionAmount = (viewportHeight * 0.12) * (index + 1)
+            const targetYOffset = index * baseSpacing - reductionAmount
             const yOffset = gsap.utils.interpolate(
               initialYOffset,
               targetYOffset,
