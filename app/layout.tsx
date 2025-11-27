@@ -10,6 +10,9 @@ import { Suspense } from 'react'
 export const metadata: Metadata = {
   title: 'Adam Farhat - Student Founder, Builder, and Thinker',
   description: 'Personal website of Adam Farhat - showcasing projects, blog posts, and thoughts.',
+  icons: {
+    icon: '/favicon.png',
+  },
   openGraph: {
     title: 'Adam Farhat',
     description: 'Student Founder, Builder, and Thinker',
