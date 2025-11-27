@@ -21,6 +21,11 @@ export default function ThemeToggle() {
     try {
       localStorage.setItem('theme', newTheme)
       document.documentElement.classList.toggle('dark', newTheme === 'dark')
+      
+      // Dispatch custom event for theme change so other components can listen
+      window.dispatchEvent(new CustomEvent('themechange', { 
+        detail: { theme: newTheme } 
+      }))
     } catch (error) {
       console.error('Failed to save theme preference:', error)
     }

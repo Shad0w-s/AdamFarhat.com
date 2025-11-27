@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import SplineBackground from './SplineBackground'
 
 const suffixes = [
   'AI in "boring" industries',
@@ -41,8 +42,11 @@ export default function Hero() {
   }, [mounted])
 
   return (
-    <section className="min-h-[60vh] md:min-h-[70vh] flex items-center justify-center px-6 md:px-20 lg:px-24 xl:px-32 py-20 md:py-32">
-      <div className="text-left max-w-5xl w-full">
+    <section className="relative min-h-[60vh] md:min-h-[70vh] flex items-center justify-center px-6 md:px-20 lg:px-24 xl:px-32 py-20 md:py-32 overflow-hidden">
+      {/* Spline 3D Background */}
+      <SplineBackground />
+
+      <div className="relative z-10 text-left max-w-5xl w-full">
         <h1 className="text-display font-display font-bold mb-8 md:mb-12 leading-[0.95]">
           a student founder curious about…
         </h1>
