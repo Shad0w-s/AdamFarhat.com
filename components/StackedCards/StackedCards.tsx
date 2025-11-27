@@ -17,6 +17,9 @@ export default function StackedCards({ cards, stickyTop = 104 }: StackedCardsPro
   const containerRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const stackRegionRef = useRef<HTMLDivElement>(null)
+  
+  // Only apply extra spacing in production
+  const isProduction = process.env.NODE_ENV === 'production'
 
   useEffect(() => {
     const cardElements = cardRefs.current.filter(Boolean) as HTMLDivElement[]
@@ -44,12 +47,16 @@ export default function StackedCards({ cards, stickyTop = 104 }: StackedCardsPro
 
         if (isLastCard) {
           // Card 3: pin immediately with minimal end distance, use stack region as endTrigger
-          // This ensures it unpins when stack region ends (along with cards 1 & 2)
+          // In production, end earlier to ensure button is always visible
+          const endPosition = isProduction 
+            ? `bottom-=${window.innerHeight * 0.3} bottom` // End 30vh earlier in production
+            : 'bottom bottom'
+          
           ScrollTrigger.create({
             trigger: card,
             start: `top top+=${stickyTop + i * 40}`,
             endTrigger: stackRegionRef.current!,
-            end: 'bottom bottom',
+            end: endPosition,
             pin: true,
             pinSpacing: false,
             anticipatePin: 1,
@@ -96,6 +103,10 @@ export default function StackedCards({ cards, stickyTop = 104 }: StackedCardsPro
           ))}
         </div>
       </div>
+      {/* Spacer to ensure content below is always visible - production only */}
+      {isProduction && (
+        <div className="h-[30vh]" aria-hidden="true" />
+      )}
     </div>
   )
 }
