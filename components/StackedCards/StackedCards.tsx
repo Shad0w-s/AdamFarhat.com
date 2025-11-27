@@ -47,16 +47,12 @@ export default function StackedCards({ cards, stickyTop = 104 }: StackedCardsPro
 
         if (isLastCard) {
           // Card 3: pin immediately with minimal end distance, use stack region as endTrigger
-          // In production, end earlier to ensure button is always visible
-          const endPosition = isProduction 
-            ? `bottom-=${window.innerHeight * 0.3} bottom` // End 30vh earlier in production
-            : 'bottom bottom'
-          
+          // This ensures it unpins when stack region ends (along with cards 1 & 2)
           ScrollTrigger.create({
             trigger: card,
             start: `top top+=${stickyTop + i * 40}`,
             endTrigger: stackRegionRef.current!,
-            end: endPosition,
+            end: 'bottom bottom',
             pin: true,
             pinSpacing: false,
             anticipatePin: 1,
