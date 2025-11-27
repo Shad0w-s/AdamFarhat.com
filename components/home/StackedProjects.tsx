@@ -68,7 +68,7 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
             const baseReduction = viewportHeight * 0.12 * (index + 1)
 
             const extraLiftForLast =
-              index === projects.length - 1 ? viewportHeight * 0.2 : 0
+              index === projects.length - 1 ? viewportHeight * 0.35 : 0
 
             const targetYOffset = initialYOffset - baseReduction - extraLiftForLast
 
@@ -111,7 +111,7 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
   )
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative pb-[200vh]">
       <div className="space-y-0">
         {projects.map((project, index) => {
           // Determine colors based on index
@@ -141,11 +141,6 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
             arrowColor = 'text-gray-300/60'
           }
 
-          // Dynamic bottom margin based on viewport
-          const dynamicBottomMargin = typeof window !== 'undefined'
-            ? `-${window.innerHeight * 0.3}px`
-            : '-200px'
-
           return (
             <div
               key={project.slug}
@@ -155,7 +150,6 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
               style={{
                 opacity: 1,
                 zIndex: projects.length - index,
-                marginBottom: dynamicBottomMargin,
               }}
               className="sticky top-20 md:top-24"
             >
