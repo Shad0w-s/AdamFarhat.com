@@ -71,28 +71,9 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
               cardProgress
             )
 
-            // Scale animation: slight scale up in the middle
-            // Scale goes from 0.96 -> 1.0 -> 0.96 as progress goes 0 -> 0.5 -> 1
-            // Using interpolate approach: map progress through keyframe values
-            const scaleValues = [0.96, 1.0, 0.96]
-            const progressPoints = [0, 0.5, 1]
-            
-            // Find the segment and interpolate within it
-            let scale: number
-            if (cardProgress <= 0.5) {
-              // First segment: 0 -> 0.5 maps to 0.96 -> 1.0
-              const segmentProgress = cardProgress / 0.5 // Normalize to 0-1
-              scale = gsap.utils.interpolate(0.96, 1.0, segmentProgress)
-            } else {
-              // Second segment: 0.5 -> 1 maps to 1.0 -> 0.96
-              const segmentProgress = (cardProgress - 0.5) / 0.5 // Normalize to 0-1
-              scale = gsap.utils.interpolate(1.0, 0.96, segmentProgress)
-            }
-
             // Apply transforms with GSAP for smooth performance
             gsap.set(cardElement, {
               y: yOffset,
-              scale: scale,
               force3D: true,
             })
           })
