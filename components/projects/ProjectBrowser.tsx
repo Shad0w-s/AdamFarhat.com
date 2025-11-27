@@ -29,8 +29,8 @@ export default function ProjectBrowser({ initialProjects }: ProjectBrowserProps)
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
         <div className="flex flex-wrap gap-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-500 block">Category</label>
-            <div className="flex flex-wrap gap-2">
+            <span className="text-sm font-medium text-gray-500 block">Category</span>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Category filter">
               {categories.map((c) => (
                 <button
                   key={c}
@@ -48,8 +48,8 @@ export default function ProjectBrowser({ initialProjects }: ProjectBrowserProps)
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-500 block">Year</label>
-            <div className="flex flex-wrap gap-2">
+            <span className="text-sm font-medium text-gray-500 block">Year</span>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Year filter">
               {years.map((y) => (
                 <button
                   key={y}
