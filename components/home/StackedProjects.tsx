@@ -58,7 +58,7 @@ export default function StackedProjects({ projects }: StackedProjectsProps) {
             const cardProgress = gsap.utils.clamp(
               0,
               1,
-              gsap.utils.mapRange(cardStart, cardEnd, 0, 1, progress, true)
+              gsap.utils.mapRange(cardStart, cardEnd, 0, 1, progress)
             )
 
             // Calculate dynamic Y offset
