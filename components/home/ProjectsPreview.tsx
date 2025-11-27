@@ -20,6 +20,9 @@ export default function ProjectsPreview({ projects }: ProjectsPreviewProps) {
     ctaUrl: `/projects/${project.slug}`,
   }))
 
+  // Only apply extra padding in production
+  const isProduction = process.env.NODE_ENV === 'production'
+
   return (
     <SectionContainer maxWidth="full" className="max-w-container">
       <div className="mb-8 md:mb-12">
@@ -29,7 +32,7 @@ export default function ProjectsPreview({ projects }: ProjectsPreviewProps) {
         </p>
       </div>
       <StackedCards cards={cards} />
-      <div className="text-center pt-6">
+      <div className={`text-center pt-6 ${isProduction ? 'pt-[20vh]' : ''}`}>
         <Link
           href="/projects"
           className="inline-flex items-center gap-2 px-6 py-3 border border-foreground/20 rounded-md hover:border-foreground/40 hover:bg-foreground/5 transition-all group"
